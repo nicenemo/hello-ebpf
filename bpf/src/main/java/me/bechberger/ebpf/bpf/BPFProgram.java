@@ -326,6 +326,9 @@ public abstract class BPFProgram implements AutoCloseable {
 
     private final Set<MemorySegment> attachedStructOps = new HashSet<>();
 
+    /** The attached struct_ops links by the name of their map, in attach order (for {@link #pinStructOps}). */
+    private final Map<String, MemorySegment> structOpsLinks = new LinkedHashMap<>();
+
     private java.util.List<me.bechberger.ebpf.bpf.structops.StructOpsInfo> structOpsInfo = java.util.List.of();
     private long lastAttachedStructOpsLinkId;
     private Class<?> userClass;
@@ -2333,7 +2336,59 @@ public abstract class BPFProgram implements AutoCloseable {
             throw new BPFLoadError.StructOpsAttachFailed(name, detail);
         }
         attachedStructOps.add(link);
+        structOpsLinks.put(name, link);
         lastAttachedStructOpsLinkId = link.address();
+    }
+
+    /**
+     * Pins every attached struct_ops link to the BPF filesystem as {@code <directory>/<map name>} and disconnects it
+     * from this program, so that the struct_ops stays attached in the kernel after {@link #close()} and after the
+     * Java process exits, until the pinned file is removed ({@code rm}, or {@link #unpinStructOps}).
+     *
+     * <p>The directory must exist (for example {@code /sys/fs/bpf/myproject}). Without a pin, closing the program
+     * detaches the struct_ops.
+     *
+     * @param directory absolute directory under the BPF filesystem
+     * @return the pinned paths, in attach order
+     * @throws BPFError if pinning fails; links pinned before the failure stay pinned
+     */
+    public java.util.List<String> pinStructOps(String directory) {
+        var paths = new java.util.ArrayList<String>();
+        for (var entry : structOpsLinks.entrySet()) {
+            var path = directory + "/" + entry.getKey();
+            try (Arena arena = Arena.ofConfined()) {
+                int ret = Lib.bpf_link__pin(entry.getValue(), arena.allocateFrom(path));
+                if (ret != 0) {
+                    throw new BPFError("Failed to pin struct_ops link '" + entry.getKey() + "' to " + path + ": " + ret);
+                }
+            }
+            // A disconnected link is not detached by bpf_link__destroy(), which then only closes the file descriptor.
+            Lib.bpf_link__disconnect(entry.getValue());
+            paths.add(path);
+        }
+        return paths;
+    }
+
+    /**
+     * Removes pinned struct_ops links again; the kernel detaches the struct_ops when the last reference goes.
+     *
+     * @param directory the directory that was given to {@link #pinStructOps}
+     * @param mapNames  the names of the struct_ops maps ({@code StructOpsInfo.mapName()})
+     */
+    public static void unpinStructOps(String directory, java.util.Collection<String> mapNames) {
+        for (var name : mapNames) {
+            try (Arena arena = Arena.ofConfined()) {
+                int fd = Lib.bpf_obj_get(arena.allocateFrom(directory + "/" + name));
+                if (fd >= 0) {
+                    LibC.close(fd);
+                }
+            }
+            try {
+                java.nio.file.Files.deleteIfExists(java.nio.file.Path.of(directory, name));
+            } catch (java.io.IOException e) {
+                throw new BPFError("Failed to remove pinned struct_ops link " + directory + "/" + name + ": " + e);
+            }
+        }
     }
 
     /**
