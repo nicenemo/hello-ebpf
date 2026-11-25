@@ -6,7 +6,7 @@ import me.bechberger.ebpf.annotations.bpf.BuiltinBPFFunction;
 import me.bechberger.ebpf.annotations.bpf.NotUsableInJava;
 import me.bechberger.ebpf.bpf.BPFError;
 import me.bechberger.ebpf.bpf.raw.Lib;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.type.BPFType;
 import me.bechberger.ebpf.type.Ptr;
 
@@ -61,7 +61,7 @@ public class BPFPerCpuArray<V> extends BPFMap {
     }
 
     private int numCpus() {
-        return Lib_2.libbpf_num_possible_cpus();
+        return Lib.libbpf_num_possible_cpus();
     }
 
     /** Aligned per-CPU value stride (rounded up to 8 bytes as required by the kernel). */

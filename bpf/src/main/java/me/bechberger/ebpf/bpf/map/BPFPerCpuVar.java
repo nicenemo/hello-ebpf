@@ -7,7 +7,7 @@ import me.bechberger.ebpf.annotations.bpf.NotUsableInJava;
 import me.bechberger.ebpf.annotations.bpf.MethodIsBPFRelatedFunction;
 import me.bechberger.ebpf.bpf.BPFError;
 import me.bechberger.ebpf.bpf.raw.Lib;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.type.BPFType;
 import me.bechberger.ebpf.type.Ptr;
 
@@ -67,7 +67,7 @@ public class BPFPerCpuVar<V> extends BPFMap {
     }
 
     private int numCpus() {
-        return Lib_2.libbpf_num_possible_cpus();
+        return Lib.libbpf_num_possible_cpus();
     }
 
     private long stride() {
@@ -115,7 +115,7 @@ public class BPFPerCpuVar<V> extends BPFMap {
 
     /**
      * Overwrites the value on all CPUs simultaneously.
-     * {@code values} must have exactly {@link Lib_2#libbpf_num_possible_cpus()} elements.
+     * {@code values} must have exactly {@link Lib#libbpf_num_possible_cpus()} elements.
      */
     public void setAll(List<V> values) {
         int cpus = numCpus();

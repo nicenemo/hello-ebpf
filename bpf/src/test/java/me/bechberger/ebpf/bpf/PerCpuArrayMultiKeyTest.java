@@ -4,7 +4,7 @@ import me.bechberger.ebpf.annotations.bpf.BPF;
 import me.bechberger.ebpf.annotations.bpf.BPFMapDefinition;
 import me.bechberger.ebpf.annotations.bpf.Kprobe;
 import me.bechberger.ebpf.bpf.map.BPFPerCpuArray;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.runtime.PtDefinitions;
 import me.bechberger.ebpf.type.Ptr;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ public class PerCpuArrayMultiKeyTest {
     @Timeout(15)
     public void testMultiKeyPerCpuArray() throws InterruptedException {
         try (var program = BPFProgram.load(Program.class)) {
-            int numCpus = Lib_2.libbpf_num_possible_cpus();
+            int numCpus = Lib.libbpf_num_possible_cpus();
             assertTrue(numCpus > 0, "should have at least 1 CPU");
 
             // Zero-initialise all keys.
@@ -103,7 +103,7 @@ public class PerCpuArrayMultiKeyTest {
     @Timeout(10)
     public void testSetAllAndSumAll() {
         try (var program = BPFProgram.load(Program.class)) {
-            int numCpus = Lib_2.libbpf_num_possible_cpus();
+            int numCpus = Lib.libbpf_num_possible_cpus();
 
             // Set key 0: all CPUs = 5
             program.counters.setAll(0, Collections.nCopies(numCpus, 5));
@@ -130,7 +130,7 @@ public class PerCpuArrayMultiKeyTest {
     @Timeout(10)
     public void testGetAllSize() {
         try (var program = BPFProgram.load(Program.class)) {
-            int numCpus = Lib_2.libbpf_num_possible_cpus();
+            int numCpus = Lib.libbpf_num_possible_cpus();
 
             for (int k = 0; k < 4; k++) {
                 List<Integer> vals = program.counters.getAll(k);

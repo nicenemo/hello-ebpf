@@ -4,7 +4,7 @@ import me.bechberger.ebpf.annotations.bpf.BPF;
 import me.bechberger.ebpf.annotations.bpf.BPFFunction;
 import me.bechberger.ebpf.annotations.bpf.BPFMapDefinition;
 import me.bechberger.ebpf.bpf.map.BPFPerCpuArray;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.runtime.PtDefinitions;
 import me.bechberger.ebpf.type.Ptr;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class PerCpuArrayTest {
     @Timeout(15)
     public void testPerCpuCounter() {
         try (var program = BPFProgram.load(Program.class)) {
-            int numCpus = Lib_2.libbpf_num_possible_cpus();
+            int numCpus = Lib.libbpf_num_possible_cpus();
             assertTrue(numCpus > 0);
 
             // Before attaching: test Java-side read/write without racing BPF writes

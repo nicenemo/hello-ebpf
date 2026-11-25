@@ -4,7 +4,7 @@ import me.bechberger.ebpf.annotations.bpf.BPF;
 import me.bechberger.ebpf.annotations.bpf.BPFFunction;
 import me.bechberger.ebpf.annotations.bpf.BPFMapDefinition;
 import me.bechberger.ebpf.bpf.map.BPFPerCpuHashMap;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.runtime.PtDefinitions;
 import me.bechberger.ebpf.type.Ptr;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ public class PerCpuHashMapTest {
     @Timeout(15)
     public void testPerCpuHashCounter() {
         try (var program = BPFProgram.load(Program.class)) {
-            int numCpus = Lib_2.libbpf_num_possible_cpus();
+            int numCpus = Lib.libbpf_num_possible_cpus();
             assertTrue(numCpus > 0);
 
             // Seed value 0 on all CPUs so BPF increments work without a branch

@@ -6,7 +6,7 @@ import me.bechberger.ebpf.annotations.bpf.MethodIsBPFRelatedFunction;
 import me.bechberger.ebpf.annotations.bpf.NotUsableInJava;
 import me.bechberger.ebpf.bpf.BPFError;
 import me.bechberger.ebpf.bpf.raw.Lib;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.shared.PanamaUtil;
 import me.bechberger.ebpf.type.BPFType;
 import me.bechberger.ebpf.type.Ptr;
@@ -70,7 +70,7 @@ public class BPFLRUPerCpuHashMap<K, V> extends BPFMap {
     public BPFType<V> getValueType() { return valueType; }
 
     private int numCpus() {
-        return Lib_2.libbpf_num_possible_cpus();
+        return Lib.libbpf_num_possible_cpus();
     }
 
     private long stride() {

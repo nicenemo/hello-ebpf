@@ -11,7 +11,7 @@ import me.bechberger.ebpf.bpf.BPFProgram;
 import me.bechberger.ebpf.bpf.map.BPFHashMap;
 import me.bechberger.ebpf.bpf.map.BPFStackTraceMap;
 import me.bechberger.ebpf.bpf.perf.PerfEvent;
-import me.bechberger.ebpf.bpf.raw.Lib_2;
+import me.bechberger.ebpf.bpf.raw.Lib;
 import me.bechberger.ebpf.shared.PanamaUtil.HandlerWithErrno;
 import me.bechberger.ebpf.type.Ptr;
 
@@ -247,7 +247,7 @@ public abstract class CPUProfiler extends BPFProgram {
         private void profile() throws Exception {
             try (CPUProfiler program = BPFProgram.load(CPUProfiler.class)) {
                 var progHandle = program.getProgramByName("onSample");
-                int numCpus    = Lib_2.libbpf_num_possible_cpus();
+                int numCpus    = Lib.libbpf_num_possible_cpus();
                 var perfFds    = new ArrayList<Integer>(numCpus);
 
                 for (int cpu = 0; cpu < numCpus; cpu++) {
