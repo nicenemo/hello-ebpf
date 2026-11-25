@@ -54,7 +54,7 @@ class HidBpfOpsSmokeTest {
         }
 
         @Override
-        public int hidId() { return 0; }
+        public int hidId() { return 2; } // 0003:1209:0001.0002 (Nachtgespenst NG-S3); the id changes at every replug
     }
 
     @Test
